@@ -1,5 +1,5 @@
 import os
-
+from fastapi import FastAPI
 
 app = FastAPI(title="Service_Template")
 SERVICE_NAME = os.getenv("SERVICE_NAME", "Service_Template")
