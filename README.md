@@ -2,7 +2,7 @@
 
 > One line: what this is and who it is for.
 
-![CI](#) <!-- Add the GitHub Actions status badge here -->
+[![CI](https://github.com/Shirojoufu/Service-Template/actions/workflows/ci.yml/badge.svg)](https://github.com/Shirojoufu/Service-Template/actions/workflows/ci.yml)
 
 ## Demo
 <!-- GIF, screenshot or terminal recording -->
