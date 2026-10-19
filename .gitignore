@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+kubeconfig*
+# Helm
+charts/*/charts/
+*.tgz
+# Editors
+.vscode/
+.idea/
+# OS
+.DS_Store
+Thumbs.db
