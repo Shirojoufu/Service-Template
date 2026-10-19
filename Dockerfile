@@ -33,6 +33,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-dev --no-install-project
 
+# pip ships with the base image but is never used at runtime (uv installs
+# everything). Removing it drops its vendored urllib3/msgpack/setuptools,
+# which otherwise show up as Trivy findings.
+RUN python -m pip uninstall --yes pip
+
 COPY app ./app
 
 ENV PATH="/app/.venv/bin:$PATH"
