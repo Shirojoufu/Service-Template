@@ -1,1 +1,22 @@
-# TODO: image, port 8000, resource requests/limits, team label
+replicaCount: 1
+
+image:
+  repository: paved-road-service
+  tag: dev
+  pullPolicy: IfNotPresent
+
+# Every workload must carry a team label (enforced later by the
+# admission policy in policy/k8s/) so RBAC and ownership stay traceable.
+team: team-a
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
