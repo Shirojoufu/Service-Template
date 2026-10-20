@@ -1,6 +1,6 @@
 # 0003: Webhook failure policy (Ignore vs Fail)
 
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -21,15 +21,21 @@ changing.
 
 Use `failurePolicy: Fail`, and limit the damage an outage can cause:
 
-- Exclude the webhook's own `policy` namespace and `kube-system` with a
-  `namespaceSelector` on the built-in `kubernetes.io/metadata.name` label, so
-  the webhook can always be redeployed or fixed, and cluster components are
-  never blocked.
+- Exclude namespaces by name with a `namespaceSelector` on the built-in
+  `kubernetes.io/metadata.name` label:
+  - `policy`, so the webhook can always be redeployed or fixed
+  - `kube-system`, so cluster components are never blocked
+  - `cert-manager`, which issues the webhook's own certificate
+  - `local-path-storage`, kind's built-in storage provisioner
 - Scope the rule to Deployment create and update only, not every resource.
-- Set a short `timeoutSeconds` so a slow webhook fails fast instead of making
+- Set `timeoutSeconds: 5` so a slow webhook fails fast instead of making
   `kubectl apply` hang.
-- Run more than one replica of the webhook so a single pod restart does not
-  cause an outage.
+- Run two replicas of the webhook so a single pod restart does not cause an
+  outage.
+
+These are implemented in
+[policy/k8s/validating-webhook.yaml](../../policy/k8s/validating-webhook.yaml)
+and [policy/k8s/deployment.yaml](../../policy/k8s/deployment.yaml).
 
 ## Alternatives considered
 

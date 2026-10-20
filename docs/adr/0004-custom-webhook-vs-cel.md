@@ -1,6 +1,6 @@
 # 0004: Custom webhook vs built-in CEL policies vs Kyverno
 
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 

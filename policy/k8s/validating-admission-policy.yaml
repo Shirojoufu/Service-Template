@@ -1,1 +1,41 @@
-# TODO: 'team' label rule rewritten as CEL
+# The webhook's `team` label rule, rewritten as a built-in CEL policy so the
+# two approaches can be compared (docs/adr/0004). Runs inside the apiserver:
+# no Deployment, Service, TLS cert or network hop.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: require-team-label
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments"]
+    # Same exclusions as validating-webhook.yaml.
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["policy", "kube-system", "cert-manager", "local-path-storage"]
+  validations:
+    - expression: >-
+        has(object.metadata.labels) &&
+        'team' in object.metadata.labels &&
+        object.metadata.labels['team'] != ''
+      message: "metadata.labels.team is required"
+    - expression: >-
+        has(object.spec.template.metadata.labels) &&
+        'team' in object.spec.template.metadata.labels &&
+        object.spec.template.metadata.labels['team'] != ''
+      message: "spec.template.metadata.labels.team is required"
+---
+# A policy does nothing until it is bound.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: require-team-label
+spec:
+  policyName: require-team-label
+  validationActions: ["Deny"]
