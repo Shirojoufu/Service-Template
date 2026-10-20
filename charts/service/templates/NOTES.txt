@@ -1,0 +1,7 @@
+{{ .Release.Name }} is deployed. Reach it with:
+
+  kubectl port-forward svc/{{ .Release.Name }}-service {{ .Values.service.port }}:{{ .Values.service.port }}
+
+then visit:
+
+  http://localhost:{{ .Values.service.port }}/hello/graham
