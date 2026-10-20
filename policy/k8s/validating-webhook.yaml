@@ -1,1 +1,37 @@
-# TODO: ValidatingWebhookConfiguration with inject-ca-from annotation
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: policy-webhook
+  annotations:
+    # cert-manager's cainjector fills in caBundle below from this Certificate,
+    # so the apiserver trusts the webhook's self-signed cert.
+    cert-manager.io/inject-ca-from: policy/policy-webhook-tls
+webhooks:
+  - name: deployments.policy.paved-road.dev
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    # See docs/adr/0003: enforce strictly, but limit the blast radius below.
+    failurePolicy: Fail
+    timeoutSeconds: 5
+    clientConfig:
+      service:
+        name: policy-webhook
+        namespace: policy
+        path: /validate
+        port: 443
+    rules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments"]
+        scope: Namespaced
+    # Excluded by name using the label every namespace gets automatically:
+    #   policy             - the webhook must always be able to redeploy itself
+    #   kube-system        - cluster components must never be blocked
+    #   cert-manager       - issues the webhook's own cert
+    #   local-path-storage - kind's built-in storage provisioner
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["policy", "kube-system", "cert-manager", "local-path-storage"]

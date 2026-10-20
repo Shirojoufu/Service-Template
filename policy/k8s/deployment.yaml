@@ -1,1 +1,66 @@
-#TODO: webhook Deployment mounting the TLS Secret
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-webhook
+  namespace: policy
+  labels:
+    app: policy-webhook
+spec:
+  # More than one replica so a single pod restart doesn't block every
+  # Deployment in the cluster (failurePolicy: Fail, see docs/adr/0003).
+  replicas: 2
+  selector:
+    matchLabels:
+      app: policy-webhook
+  template:
+    metadata:
+      labels:
+        app: policy-webhook
+    spec:
+      # Required by the namespace's `restricted` Pod Security profile.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: webhook
+          image: paved-road-policy:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: https
+              containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          # Path expected by policy/Dockerfile's CMD.
+          volumeMounts:
+            - name: tls
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: tls
+          secret:
+            # Issued and rotated by cert-manager (policy/k8s/certificate.yaml).
+            secretName: policy-webhook-tls

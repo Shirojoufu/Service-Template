@@ -79,16 +79,37 @@ curl localhost:8000/hello/graham
 
 ### Policy webhook (`policy/`)
 
-The admission webhook's TLS cert is issued by [cert-manager](https://cert-manager.io/),
-not managed by hand. Install it once per cluster before applying anything under
-`policy/k8s/`:
+An admission webhook that rejects Deployments without a `team` label, resource
+requests and limits, or a pinned image tag. The `team` rule is also written as
+a built-in CEL policy for comparison ([ADR 0004](docs/adr/0004-custom-webhook-vs-cel.md)).
+With a cluster already up from `make up`:
 
 ```
-make cert-manager
+make policy
 ```
 
-This is a separate, idempotent target (not part of `up`), since the plain app
-deploy above doesn't need it.
+This installs [cert-manager](https://cert-manager.io/) (which issues the
+webhook's TLS cert), creates the `policy`, `team-a` and `team-b` namespaces
+with their RBAC, deploys the webhook, and only then registers it with the
+apiserver. It is a separate target from `up`, since the plain app doesn't
+need it.
+
+Try it:
+
+```
+$ kubectl create deployment bad --image=nginx:latest -n team-a
+... ValidatingAdmissionPolicy 'require-team-label' ... denied request:
+    metadata.labels.team is required
+```
+
+A Deployment that has the `team` label but uses `:latest` and no resources
+passes the CEL policy and is rejected by the webhook instead:
+
+```
+admission webhook "deployments.policy.paved-road.dev" denied the request:
+image 'nginx:latest' must not use the 'latest' tag; ...
+container 'web' is missing resources.requests.cpu; ...
+```
 
 ## Architecture
 
@@ -109,9 +130,10 @@ flowchart LR
         scan -->|main only| ghcr[(GHCR)]
     end
 
-    subgraph policy["Policy webhook (in progress)"]
-        api[kube-apiserver] -->|AdmissionReview over TLS| wh["policy-webhook:8443<br/>/validate"]
-        cm[cert-manager] -->|issues TLS Secret| wh
+    subgraph policy["Policy: make policy"]
+        api[kube-apiserver] -->|"1. CEL policy (in-process)"| cel[require-team-label]
+        api -->|"2. AdmissionReview over TLS"| wh["policy-webhook x2<br/>/validate"]
+        cm[cert-manager] -->|issues TLS Secret + injects CA| wh
     end
 ```
 
@@ -122,9 +144,12 @@ flowchart LR
 - **CI:** every PR runs lint, tests, build and a Trivy scan that fails on
   fixable HIGH/CRITICAL findings. On `main`, the scanned image itself is
   pushed to GHCR, not a rebuild.
-- **Policy webhook:** rejects Deployments without a `team` label, resource
-  requests/limits, or a pinned image tag. The webhook code, image, TLS cert
-  and team RBAC exist; wiring it into the cluster is still in progress.
+- **Policy:** a FastAPI webhook in [policy/](policy/) rejects Deployments
+  without a `team` label, resource requests/limits, or a pinned image tag. It
+  runs as two replicas under the `restricted` Pod Security profile with
+  `failurePolicy: Fail`, and skips system namespaces so it can never lock
+  itself out ([ADR 0003](docs/adr/0003-webhook-failure-policy.md)). Teams get
+  namespace-scoped RBAC that lets them manage workloads but not read Secrets.
 
 ## Decisions
 
@@ -137,9 +162,9 @@ Architecture decision records live in [docs/adr/](docs/adr/):
 
 ## What I'd do next
 
-1. **Finish the policy webhook.** Add the Deployment, Service and
-   `ValidatingWebhookConfiguration`, then the CEL version of the same rule,
-   so the two approaches can be compared directly.
+1. **Build and scan the webhook image in CI.** The webhook's tests run in CI,
+   but its image is only built locally by `make policy`, so it never goes
+   through the Trivy scan.
 2. **Deploy the chart in CI.** CI builds and scans the image but never installs
    the chart. A job that starts kind, runs `helm install` and checks `/healthz`
    would catch chart breakage before merge.
