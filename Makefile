@@ -1,7 +1,7 @@
 CLUSTER := paved-road
 IMAGE   := paved-road
 TAG     := dev
-RELEASE := hello
+RELEASE := paved-road
 SERVICE := $(RELEASE)-service
 PORT    := 8000
 

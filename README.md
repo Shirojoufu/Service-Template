@@ -41,7 +41,7 @@ and Helm already installed.
 After `make up`, forward the service and hit it:
 
 ```
-kubectl port-forward svc/hello-service 8000:8000
+kubectl port-forward svc/paved-road-service 8000:8000
 curl localhost:8000/hello/graham
 ```
 
