@@ -5,6 +5,14 @@ RELEASE := hello
 SERVICE := $(RELEASE)-service
 PORT    := 8000
 
+# Recipes use POSIX shell syntax (grep, ||). When `make` is invoked from
+# PowerShell or cmd.exe it otherwise falls back to cmd.exe per line, which
+# doesn't have grep. Force Git Bash so recipes behave the same everywhere.
+ifeq ($(OS),Windows_NT)
+SHELL := C:/Program Files/Git/bin/bash.exe
+.SHELLFLAGS := -c
+endif
+
 .PHONY: test build cluster deploy up down
 
 test:

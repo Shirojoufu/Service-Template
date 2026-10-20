@@ -14,7 +14,7 @@ make up      # test, build, load into a local kind cluster, and deploy via Helm
 make down    # tear down the kind cluster
 ```
 
-**Time to first deploy: 44.3s** (`time make up`, fresh clone, warm Docker/base-image
+**Time to first deploy: 40.3s** (`time make up`, fresh clone, warm Docker/base-image
 cache — see note below). Measured on 2026-10-20 with Docker Desktop, kind v0.30.0
 and Helm already installed.
 
