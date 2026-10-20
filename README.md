@@ -31,6 +31,19 @@ curl localhost:8000/hello/graham
 > dominated by those image pulls rather than by the build/test/deploy steps
 > themselves.
 
+### Policy webhook (`policy/`)
+
+The admission webhook's TLS cert is issued by [cert-manager](https://cert-manager.io/),
+not managed by hand. Install it once per cluster before applying anything under
+`policy/k8s/`:
+
+```
+make cert-manager
+```
+
+This is a separate, idempotent target (not part of `up`), since the plain app
+deploy above doesn't need it.
+
 ## Architecture
 <!-- Simple diagram of the parts and how they talk -->
 

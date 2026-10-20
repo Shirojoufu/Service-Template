@@ -1,1 +1,51 @@
-# TODO: team-b namespace, Role and RoleBinding
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b
+  labels:
+    team: team-b
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Self-service permissions for team-b: manage their own workloads and
+# config, but nothing cluster-scoped and nothing in another team's
+# namespace (Roles are namespace-scoped by definition).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: team-b-developer
+  namespace: team-b
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+  # Deliberately no get/list/watch on Secrets: a Pod can still mount or
+  # reference one normally (the kubelet reads it, not this RBAC), but a
+  # developer can't `kubectl get secret -o yaml` to read a value directly.
+  # Reading one is a separate, deliberate escalation, not a standing grant.
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+---
+# Bound to a Group so this plugs straight into whatever SSO/OIDC provider
+# maps team-b's members to the "team-b" group claim.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: team-b-developer-binding
+  namespace: team-b
+subjects:
+  - kind: Group
+    name: team-b
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: team-b-developer
+  apiGroup: rbac.authorization.k8s.io

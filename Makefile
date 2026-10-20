@@ -13,7 +13,7 @@ SHELL := C:/Program Files/Git/bin/bash.exe
 .SHELLFLAGS := -c
 endif
 
-.PHONY: test build cluster deploy up down
+.PHONY: test build cluster deploy up down cert-manager
 
 test:
 	uv sync --locked
@@ -43,3 +43,15 @@ up: test build cluster deploy
 
 down:
 	kind delete cluster --name $(CLUSTER)
+
+# Prerequisite for the policy webhook's TLS cert (policy/k8s/certificate.yaml
+# relies on the cert-manager CRDs/controller being present in-cluster).
+# Idempotent: safe to re-run against a cluster that already has it. Not part
+# of `up`, since the plain app deploy doesn't need it -- run this before
+# applying anything under policy/k8s/.
+CERT_MANAGER_VERSION := v1.21.2
+
+cert-manager:
+	@kubectl cluster-info >/dev/null 2>&1 || { echo "No cluster reachable -- run 'make cluster' first."; exit 1; }
+	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/$(CERT_MANAGER_VERSION)/cert-manager.yaml
+	kubectl wait --for=condition=Available deployment -n cert-manager --all --timeout=120s
