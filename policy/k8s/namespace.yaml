@@ -1,1 +1,15 @@
-# TODO: 'policy' namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: policy
+  labels:
+    # Pod Security admission: the webhook itself runs as non-root with no
+    # extra capabilities (see policy/Dockerfile), so enforce the strictest
+    # built-in profile here too.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+  # No `team` label here deliberately: this namespace hosts the admission
+  # webhook itself, not a team's workloads, so the webhook's own `team`-label
+  # rule shouldn't apply to it. It's excluded by name instead, via
+  # `namespaceSelector` in validating-webhook.yaml -- see the note there.
