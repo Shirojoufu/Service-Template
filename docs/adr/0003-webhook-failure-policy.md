@@ -34,8 +34,9 @@ Use `failurePolicy: Fail`, and limit the damage an outage can cause:
   outage.
 
 These are implemented in
-[policy/k8s/validating-webhook.yaml](../../policy/k8s/validating-webhook.yaml)
-and [policy/k8s/deployment.yaml](../../policy/k8s/deployment.yaml).
+[validating-webhook.yaml](../../charts/policy-webhook/templates/validating-webhook.yaml)
+and [deployment.yaml](../../charts/policy-webhook/templates/deployment.yaml) in the
+[policy-webhook chart](../../charts/policy-webhook/).
 
 ## Alternatives considered
 

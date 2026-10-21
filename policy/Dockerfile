@@ -52,8 +52,8 @@ USER appuser
 EXPOSE 8443
 
 # kube-apiserver requires TLS for webhook calls. The cert/key are expected to
-# be mounted read-only from a Secret (see policy/k8s/certificate.yaml and
-# policy/k8s/deployment.yaml) at the path below; cert-manager's convention.
+# be mounted read-only from a Secret (see charts/policy-webhook/templates/
+# certificate.yaml and deployment.yaml) at the path below; cert-manager's convention.
 CMD ["uvicorn", "policy.webhook:app", \
      "--host", "0.0.0.0", "--port", "8443", \
      "--ssl-certfile", "/etc/webhook/certs/tls.crt", \

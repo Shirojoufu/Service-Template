@@ -85,21 +85,37 @@ a built-in CEL policy for comparison ([ADR 0004](docs/adr/0004-custom-webhook-vs
 With a cluster already up from `make up`:
 
 ```
-make policy
+make policy        # build the webhook image and install charts/policy-webhook
+make policy-test   # check the policies against the live cluster
 ```
 
-This installs [cert-manager](https://cert-manager.io/) (which issues the
-webhook's TLS cert), creates the `policy`, `team-a` and `team-b` namespaces
-with their RBAC, deploys the webhook, and only then registers it with the
-apiserver. It is a separate target from `up`, since the plain app doesn't
-need it.
+`make policy` installs [cert-manager](https://cert-manager.io/) (which issues
+the webhook's TLS cert), creates the `policy`, `team-a` and `team-b`
+namespaces with their RBAC, and installs the
+[policy-webhook chart](charts/policy-webhook/). It returns only once the
+policies are actually enforced. It is a separate target from `up`, since the
+plain app doesn't need it.
 
-Try it:
+`make policy-test` runs [policy/tests/e2e.sh](policy/tests/e2e.sh), which sends
+compliant and non-compliant Deployments to the apiserver as server-side dry
+runs, so nothing is created:
+
+```
+PASS: no team label (CEL policy) rejected: metadata.labels.team is required
+PASS: :latest image (webhook) rejected: must not use the 'latest' tag
+PASS: untagged image (webhook) rejected: has no tag
+PASS: no resource requests/limits (webhook) rejected: missing resources.limits.memory
+PASS: compliant Deployment admitted
+PASS: non-compliant Deployment in an excluded namespace (kube-system) admitted
+All policy checks passed
+```
+
+Or try it by hand:
 
 ```
 $ kubectl create deployment bad --image=nginx:latest -n team-a
-... ValidatingAdmissionPolicy 'require-team-label' ... denied request:
-    metadata.labels.team is required
+... ValidatingAdmissionPolicy 'policy-webhook-require-team-label' ...
+    denied request: metadata.labels.team is required
 ```
 
 A Deployment that has the `team` label but uses `:latest` and no resources
@@ -127,9 +143,11 @@ flowchart LR
         pr[Pull request] --> lt[lint-and-test]
         lt --> cb["build<br/>app + webhook images"]
         cb --> scan["Trivy scan<br/>both images"]
-        cb --> dt["deploy-test<br/>kind + helm install + curl"]
-        scan -->|main only| ghcr[(GHCR)]
+        cb --> dt["deploy-test<br/>app chart + curl"]
+        cb --> pt["policy-test<br/>webhook chart + e2e checks"]
+        scan -->|main only| ghcr[("GHCR<br/>both images")]
         dt -->|main only| ghcr
+        pt -->|main only| ghcr
     end
 
     subgraph policy["Policy: make policy"]
@@ -145,10 +163,11 @@ flowchart LR
   removed so its vendored packages don't show up in the scan.
 - **CI:** every PR runs lint and tests, builds both the app and webhook images,
   and scans each with Trivy, failing on fixable HIGH/CRITICAL findings. In
-  parallel, `deploy-test` installs the chart into a throwaway kind cluster and
-  curls the running pod. On `main`, the app image that passed both is pushed
-  to GHCR, not a rebuild. Third-party actions and the uv image are pinned by
-  digest, and Dependabot keeps them current.
+  parallel, `deploy-test` installs the app chart into a throwaway kind cluster
+  and curls the running pod, and `policy-test` installs the webhook chart and
+  runs the same `make policy-test` checks used locally. On `main`, both images
+  that passed are pushed to GHCR, not rebuilt. Third-party actions, the uv
+  image and the runner OS are pinned, and Dependabot keeps them current.
 - **Policy:** a FastAPI webhook in [policy/](policy/) rejects Deployments
   without a `team` label, resource requests/limits, or a pinned image tag. It
   runs as two replicas under the `restricted` Pod Security profile with
@@ -167,14 +186,18 @@ Architecture decision records live in [docs/adr/](docs/adr/):
 
 ## What I'd do next
 
-1. **Package the webhook as a Helm chart.** The app is a chart but the webhook
-   is raw manifests applied in order by `make policy`, which is inconsistent
-   with [ADR 0002](docs/adr/0002-helm-over-kustomize.md).
-2. **Test the policies in CI.** `deploy-test` covers the app chart only. Running
-   `make policy` in CI and asserting that a bad Deployment is rejected would
-   catch a broken webhook or CEL rule before merge.
-3. **Publish the webhook image.** CI builds and scans it but only pushes the
-   app image to GHCR, so the webhook can only be deployed from a local build.
+1. **Close the first-install gap.** Helm creates the webhook registration at the
+   same time as the webhook pods, so for a few seconds on first install the
+   apiserver can call a webhook that isn't serving yet and reject Deployments
+   in team namespaces. Upgrades aren't affected. Registering the webhook in a
+   second step, once the pods are ready, would remove the window.
+2. **Version and publish releases.** Images are tagged only by commit SHA and
+   the charts are only installable from a clone. Semver tags and publishing
+   both charts to GHCR as OCI artifacts would let other repos depend on a
+   version.
+3. **Deploy beyond kind.** There is no staging environment. A GitOps tool such
+   as Argo CD, pointed at the published charts and images, would be the next
+   step from a local golden path to a real one.
 4. **Retire one implementation of the `team` rule.** It exists in both the
    webhook and CEL for comparison. Keeping both means two places to change it
    ([ADR 0004](docs/adr/0004-custom-webhook-vs-cel.md)).

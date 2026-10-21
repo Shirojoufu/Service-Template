@@ -21,7 +21,7 @@ There are three common ways to enforce rules like these at admission time:
 Implement the rules as a custom webhook in
 [policy/webhook.py](../../policy/webhook.py), and implement the `team` label
 rule a second time as a CEL `ValidatingAdmissionPolicy` in
-[policy/k8s/validating-admission-policy.yaml](../../policy/k8s/validating-admission-policy.yaml),
+[validating-admission-policy.yaml](../../charts/policy-webhook/templates/validating-admission-policy.yaml),
 so the two approaches can be compared on the same rule.
 
 For a production platform, the recommendation is to default to CEL policies

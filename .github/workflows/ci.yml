@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -39,7 +39,7 @@ jobs:
 
   # Both images ship, so both get built and scanned the same way.
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: lint-and-test
     strategy:
       matrix:
@@ -75,7 +75,7 @@ jobs:
           retention-days: 1
 
   scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     strategy:
       matrix:
@@ -97,7 +97,7 @@ jobs:
   # Installs the chart into a throwaway kind cluster and hits the running pod,
   # so a broken chart fails the PR instead of the next `make up`.
   deploy-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: actions/checkout@v7
@@ -140,20 +140,69 @@ jobs:
           kubectl get pods -A
           kubectl describe deployment paved-road-service
 
+  # Installs the policy-webhook chart into kind and checks that bad
+  # Deployments are rejected and good ones admitted. Uses the same make
+  # targets as local development.
+  policy-test:
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: image-policy
+          path: ${{ runner.temp }}
+
+      - uses: helm/kind-action@1544676c07bb3570fcb70166beaa07c4528fd4aa # v1.15.1
+        with:
+          cluster_name: paved-road
+
+      - name: Load image into kind
+        run: |
+          docker load --input ${{ runner.temp }}/image.tar
+          kind load docker-image paved-road-policy:${{ github.sha }} --name paved-road
+
+      - name: Lint chart
+        run: helm lint charts/policy-webhook
+
+      - name: Install cert-manager and the policy-webhook chart
+        run: make policy-deploy TAG=${{ github.sha }}
+
+      - name: Check policies are enforced
+        run: make policy-test
+
+      - name: Show cluster state on failure
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe deployment policy-webhook -n policy
+          kubectl logs -n policy deployment/policy-webhook --tail=50
+
+  # Pushes the exact images that were scanned and tested, not rebuilds
   push:
-    runs-on: ubuntu-latest
-    needs: [scan, deploy-test]
+    runs-on: ubuntu-24.04
+    needs: [scan, deploy-test, policy-test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
-    env:
-      # GHCR requires lowercase repository names
-      IMAGE: ghcr.io/shirojoufu/paved-road
+    strategy:
+      matrix:
+        include:
+          - name: app
+            image: paved-road-service
+            # GHCR requires lowercase repository names
+            target: ghcr.io/shirojoufu/paved-road
+          - name: policy
+            image: paved-road-policy
+            target: ghcr.io/shirojoufu/paved-road-policy
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: image-app
+          name: image-${{ matrix.name }}
           path: ${{ runner.temp }}
 
       - uses: docker/login-action@v4
@@ -162,9 +211,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Push the exact image that was scanned, not a rebuild
       - name: Push image
+        env:
+          SOURCE: ${{ matrix.image }}:${{ github.sha }}
+          TARGET: ${{ matrix.target }}:${{ github.sha }}
         run: |
           docker load --input ${{ runner.temp }}/image.tar
-          docker tag paved-road-service:${{ github.sha }} "$IMAGE:${{ github.sha }}"
-          docker push "$IMAGE:${{ github.sha }}"
+          docker tag "$SOURCE" "$TARGET"
+          docker push "$TARGET"

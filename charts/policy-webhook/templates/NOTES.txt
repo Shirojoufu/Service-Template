@@ -1,0 +1,6 @@
+{{ .Release.Name }} is enforcing paved-road rules on Deployments outside:
+  {{ include "policy-webhook.excludedNamespaces" . }}
+
+Check it with:
+
+  make policy-test
