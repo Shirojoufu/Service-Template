@@ -194,11 +194,10 @@ jobs:
         include:
           - name: app
             image: paved-road-service
-            # GHCR requires lowercase repository names
-            target: ghcr.io/shirojoufu/paved-road
+            package: paved-road
           - name: policy
             image: paved-road-policy
-            target: ghcr.io/shirojoufu/paved-road-policy
+            package: paved-road-policy
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -211,11 +210,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Pushes to ghcr.io/<repo owner>/<package>, so a repo created from this
+      # template publishes to its own owner with no edits. GHCR needs a
+      # lowercase name, and owners can contain capitals.
       - name: Push image
         env:
           SOURCE: ${{ matrix.image }}:${{ github.sha }}
-          TARGET: ${{ matrix.target }}:${{ github.sha }}
+          PACKAGE: ${{ matrix.package }}
+          SHA: ${{ github.sha }}
         run: |
+          TARGET="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$PACKAGE:$SHA"
           docker load --input ${{ runner.temp }}/image.tar
           docker tag "$SOURCE" "$TARGET"
           docker push "$TARGET"
+          echo "Pushed $TARGET" >> "$GITHUB_STEP_SUMMARY"
