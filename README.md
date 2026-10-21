@@ -127,6 +127,32 @@ image 'nginx:latest' must not use the 'latest' tag; ...
 container 'web' is missing resources.requests.cpu; ...
 ```
 
+## Using this template
+
+1. Click **Use this template** on GitHub to create your own repo from this one.
+2. Rename the service. Everything is named `paved-road`, so one find-and-replace
+   covers the Makefile, CI, both charts and the docs:
+
+   ```
+   git grep -l paved-road | xargs sed -i 's/paved-road/my-service/g'
+   ```
+
+   Also change the display name in [app/main.py](app/main.py)
+   (`"Service_Template"`), which the app returns in its responses.
+
+3. Point the CI badge at the top of this README at your repo.
+4. Set the `team` label in [charts/service/values.yaml](charts/service/values.yaml).
+   The policy webhook rejects Deployments without one.
+5. Push to `main`. CI publishes the images to `ghcr.io/<your-account>/...`
+   automatically, as **private** packages. Make them public in each package's
+   settings on GitHub if you need to.
+
+The policy webhook in [policy/](policy/) and
+[charts/policy-webhook/](charts/policy-webhook/) is platform tooling, installed
+once per cluster, not per service. A team that only needs the service can
+delete those two directories, the `policy-*` targets in the Makefile, and the
+`policy` entries and `policy-test` job in CI.
+
 ## Architecture
 
 ```mermaid
