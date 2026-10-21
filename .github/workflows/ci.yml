@@ -181,11 +181,16 @@ jobs:
           kubectl describe deployment policy-webhook -n policy
           kubectl logs -n policy deployment/policy-webhook --tail=50
 
-  # Pushes the exact images that were scanned and tested, not rebuilds
+  # Pushes the exact images that were scanned and tested, not rebuilds.
+  #
+  # Declaring an environment makes GitHub record a Deployment, with its
+  # success or failure, every time this runs. That's what DORA metrics tools
+  # read. Each image gets its own environment so one merge isn't counted twice.
   push:
     runs-on: ubuntu-24.04
     needs: [scan, deploy-test, policy-test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: ${{ matrix.environment }}
     permissions:
       contents: read
       packages: write
@@ -195,9 +200,11 @@ jobs:
           - name: app
             image: paved-road-service
             package: paved-road
+            environment: production
           - name: policy
             image: paved-road-policy
             package: paved-road-policy
+            environment: policy-webhook
     steps:
       - uses: actions/download-artifact@v8
         with:
