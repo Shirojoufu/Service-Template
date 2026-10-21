@@ -41,4 +41,5 @@ Use [uv](https://docs.astral.sh/uv/) for everything Python-related:
 - Contributors need uv installed (see the README prerequisites). It is newer
   than pip, so some engineers will be meeting it for the first time.
 - The Docker build copies uv in from `ghcr.io/astral-sh/uv`, which adds an
-  external image to the supply chain that should be pinned.
+  external image to the supply chain. It is pinned by version and digest, and
+  Dependabot opens a PR when a new uv release comes out.

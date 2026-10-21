@@ -3,8 +3,9 @@
 ARG PYTHON_VERSION=3.15.0
 FROM python:${PYTHON_VERSION}-slim
 
-# uv binary from the official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# uv binary from the official image, pinned by version and digest so the
+# build can't change underneath us (Dependabot bumps it)
+COPY --from=ghcr.io/astral-sh/uv:0.13.4@sha256:9f130421e930bfbdc563c00740466603f8723158e90297d07957c2294640262b /uv /usr/local/bin/uv
 
 # No .pyc files from the interpreter, unbuffered logs; uv precompiles and copies
 # (cache mount is a different filesystem, so hardlinks would fail)

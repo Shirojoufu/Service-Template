@@ -22,8 +22,11 @@ test:
 	uv run ruff check
 	uv run pytest -v
 
+# Extra flags for `docker build`, e.g. `make up BUILD_FLAGS="--no-cache --pull"`
+BUILD_FLAGS ?=
+
 build:
-	docker build -t $(IMAGE):$(TAG) .
+	docker build $(BUILD_FLAGS) -t $(IMAGE):$(TAG) .
 
 # Create the kind cluster if it doesn't already exist, then load the image
 cluster:
