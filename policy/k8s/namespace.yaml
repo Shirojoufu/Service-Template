@@ -12,4 +12,5 @@ metadata:
   # No `team` label here deliberately: this namespace hosts the admission
   # webhook itself, not a team's workloads, so the webhook's own `team`-label
   # rule shouldn't apply to it. It's excluded by name instead, via
-  # `namespaceSelector` in validating-webhook.yaml -- see the note there.
+  # `namespaceSelector` in charts/policy-webhook (the release namespace is
+  # always excluded).

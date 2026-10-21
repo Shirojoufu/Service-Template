@@ -1,0 +1,32 @@
+# Self-signed is enough: only kube-apiserver calls this webhook, and it trusts
+# whatever CA cert-manager injects into the ValidatingWebhookConfiguration.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ .Release.Name }}-selfsigned
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policy-webhook.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-tls
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policy-webhook.labels" . | nindent 4 }}
+spec:
+  # Mounted by the Deployment at /etc/webhook/certs (see policy/Dockerfile)
+  secretName: {{ .Release.Name }}-tls
+  duration: {{ .Values.certificate.duration }}
+  renewBefore: {{ .Values.certificate.renewBefore }}
+  issuerRef:
+    name: {{ .Release.Name }}-selfsigned
+    kind: Issuer
+  dnsNames:
+    - {{ .Release.Name }}.{{ .Release.Namespace }}.svc
+    - {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+  usages:
+    - server auth

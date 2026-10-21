@@ -1,0 +1,33 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "policy-webhook.labels" . | nindent 4 }}
+  annotations:
+    # cert-manager fills in caBundle from this Certificate so the apiserver
+    # trusts the webhook's self-signed cert.
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Release.Name }}-tls
+webhooks:
+  - name: deployments.policy.paved-road.dev
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    failurePolicy: {{ .Values.webhook.failurePolicy }}
+    timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}
+    clientConfig:
+      service:
+        name: {{ .Release.Name }}
+        namespace: {{ .Release.Namespace }}
+        path: /validate
+        port: 443
+    rules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments"]
+        scope: Namespaced
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: {{ include "policy-webhook.excludedNamespaces" . }}

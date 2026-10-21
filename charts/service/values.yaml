@@ -6,7 +6,7 @@ image:
   pullPolicy: IfNotPresent
 
 # Every workload must carry a team label (enforced later by the
-# admission policy in policy/k8s/) so RBAC and ownership stay traceable.
+# admission policy in charts/policy-webhook/) so RBAC and ownership stay traceable.
 team: team-a
 
 service:

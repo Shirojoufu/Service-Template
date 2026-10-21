@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policy-webhook.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "policy-webhook.selectorLabels" . | nindent 4 }}
+  ports:
+    # kube-apiserver calls webhooks on 443; forward to uvicorn's 8443
+    - name: https
+      port: 443
+      targetPort: https

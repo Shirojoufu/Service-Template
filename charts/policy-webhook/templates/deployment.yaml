@@ -1,23 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: policy-webhook
-  namespace: policy
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: policy-webhook
+    {{- include "policy-webhook.labels" . | nindent 4 }}
 spec:
-  # More than one replica so a single pod restart doesn't block every
-  # Deployment in the cluster (failurePolicy: Fail, see docs/adr/0003).
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: policy-webhook
+      {{- include "policy-webhook.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: policy-webhook
+        {{- include "policy-webhook.selectorLabels" . | nindent 8 }}
     spec:
-      # Required by the namespace's `restricted` Pod Security profile.
+      # Meets the `restricted` Pod Security profile (policy/k8s/namespace.yaml)
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -25,8 +23,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: webhook
-          image: paved-road-policy:dev
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: https
               containerPort: 8443
@@ -48,13 +46,7 @@ spec:
               scheme: HTTPS
             periodSeconds: 10
           resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 128Mi
-          # Path expected by policy/Dockerfile's CMD.
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: tls
               mountPath: /etc/webhook/certs
@@ -62,5 +54,4 @@ spec:
       volumes:
         - name: tls
           secret:
-            # Issued and rotated by cert-manager (policy/k8s/certificate.yaml).
-            secretName: policy-webhook-tls
+            secretName: {{ .Release.Name }}-tls
