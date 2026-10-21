@@ -60,9 +60,15 @@ make down    # tear down the kind cluster
 
 **Goal: first deploy in under 10 minutes.**
 
-**Time to first deploy: 40.3s** (`time make up`, fresh clone, warm Docker/base-image
-cache — see note below). Measured on 2026-10-20 with Docker Desktop, kind v0.30.0
-and Helm already installed.
+| Time to first deploy (`time make up`, fresh clone) | |
+|---|---|
+| **Cold:** nothing cached | **1m 44.8s** |
+| **Warm:** images and packages already cached | **40.3s** |
+
+The cold run started with no Docker images, no build cache, no Python
+packages and no Python interpreter. Only the tools in
+[Prerequisites](#prerequisites) were installed. Both runs used Docker Desktop on
+Windows and were measured on 2026-10-20 (warm) and 2026-10-21 (cold).
 
 After `make up`, forward the service and hit it:
 
@@ -70,12 +76,6 @@ After `make up`, forward the service and hit it:
 kubectl port-forward svc/paved-road-service 8000:8000
 curl localhost:8000/hello/graham
 ```
-
-> This number assumes the `python:3.15-slim`, `ghcr.io/astral-sh/uv` and
-> `kindest/node` images are already pulled. A genuinely cold machine (nothing
-> cached, pulling everything from scratch) will take noticeably longer,
-> dominated by those image pulls rather than by the build/test/deploy steps
-> themselves.
 
 ### Policy webhook (`policy/`)
 
@@ -125,9 +125,11 @@ flowchart LR
 
     subgraph ci["CI: GitHub Actions"]
         pr[Pull request] --> lt[lint-and-test]
-        lt --> cb[build]
-        cb --> scan[Trivy scan]
+        lt --> cb["build<br/>app + webhook images"]
+        cb --> scan["Trivy scan<br/>both images"]
+        cb --> dt["deploy-test<br/>kind + helm install + curl"]
         scan -->|main only| ghcr[(GHCR)]
+        dt -->|main only| ghcr
     end
 
     subgraph policy["Policy: make policy"]
@@ -141,9 +143,12 @@ flowchart LR
   `/readyz` back the chart's liveness and readiness probes.
 - **Image:** built with uv from `uv.lock`, runs as a non-root user, with pip
   removed so its vendored packages don't show up in the scan.
-- **CI:** every PR runs lint, tests, build and a Trivy scan that fails on
-  fixable HIGH/CRITICAL findings. On `main`, the scanned image itself is
-  pushed to GHCR, not a rebuild.
+- **CI:** every PR runs lint and tests, builds both the app and webhook images,
+  and scans each with Trivy, failing on fixable HIGH/CRITICAL findings. In
+  parallel, `deploy-test` installs the chart into a throwaway kind cluster and
+  curls the running pod. On `main`, the app image that passed both is pushed
+  to GHCR, not a rebuild. Third-party actions and the uv image are pinned by
+  digest, and Dependabot keeps them current.
 - **Policy:** a FastAPI webhook in [policy/](policy/) rejects Deployments
   without a `team` label, resource requests/limits, or a pinned image tag. It
   runs as two replicas under the `restricted` Pod Security profile with
@@ -162,14 +167,14 @@ Architecture decision records live in [docs/adr/](docs/adr/):
 
 ## What I'd do next
 
-1. **Build and scan the webhook image in CI.** The webhook's tests run in CI,
-   but its image is only built locally by `make policy`, so it never goes
-   through the Trivy scan.
-2. **Deploy the chart in CI.** CI builds and scans the image but never installs
-   the chart. A job that starts kind, runs `helm install` and checks `/healthz`
-   would catch chart breakage before merge.
-3. **Measure a cold start.** The 40.3s figure uses cached base images. A run on a
-   clean machine would give an honest upper bound.
-4. **Pin the last floating references.** The Dockerfile still pulls
-   `ghcr.io/astral-sh/uv:latest`, and the chart defaults to a local `dev` tag
-   rather than the SHA-tagged image CI pushes to GHCR.
+1. **Package the webhook as a Helm chart.** The app is a chart but the webhook
+   is raw manifests applied in order by `make policy`, which is inconsistent
+   with [ADR 0002](docs/adr/0002-helm-over-kustomize.md).
+2. **Test the policies in CI.** `deploy-test` covers the app chart only. Running
+   `make policy` in CI and asserting that a bad Deployment is rejected would
+   catch a broken webhook or CEL rule before merge.
+3. **Publish the webhook image.** CI builds and scans it but only pushes the
+   app image to GHCR, so the webhook can only be deployed from a local build.
+4. **Retire one implementation of the `team` rule.** It exists in both the
+   webhook and CEL for comparison. Keeping both means two places to change it
+   ([ADR 0004](docs/adr/0004-custom-webhook-vs-cel.md)).

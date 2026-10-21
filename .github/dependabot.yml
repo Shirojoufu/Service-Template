@@ -4,3 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  # Keeps the pinned uv and python base images in both Dockerfiles current.
+  - package-ecosystem: "docker"
+    directories: ["/", "/policy"]
+    schedule:
+      interval: "weekly"
