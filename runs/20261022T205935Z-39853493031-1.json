@@ -1,0 +1,192 @@
+{
+ "base_sha": "acf66603a22bb3854ce07b2131cf83223f9c3b7d",
+ "commit_message": "Merge b10c62cab10fb241bec76fc4d16e89c20c2b2fe4 into acf66603a22bb3854ce07b2131cf83223f9c3b7d",
+ "coverage": {
+  "covered": 64,
+  "files": {
+   "app/__init__.py": {
+    "covered": 0,
+    "missing": [],
+    "percent": 100.0,
+    "statements": 0
+   },
+   "app/main.py": {
+    "covered": 12,
+    "missing": [
+     [
+      14,
+      14
+     ]
+    ],
+    "percent": 92.31,
+    "statements": 13
+   },
+   "policy/__init__.py": {
+    "covered": 0,
+    "missing": [],
+    "percent": 100.0,
+    "statements": 0
+   },
+   "policy/webhook.py": {
+    "covered": 52,
+    "missing": [
+     [
+      20,
+      20
+     ],
+     [
+      23,
+      23
+     ],
+     [
+      56,
+      56
+     ],
+     [
+      62,
+      62
+     ]
+    ],
+    "percent": 92.86,
+    "statements": 56
+   }
+  },
+  "percent": 92.75,
+  "statements": 69
+ },
+ "diff_coverage": {
+  "changed_statements": 0,
+  "covered": 0,
+  "files": {},
+  "percent": null,
+  "unmeasured_files": []
+ },
+ "event": "pull_request",
+ "files": [
+  [
+   "app/__init__.py",
+   "e69de29bb2d1"
+  ],
+  [
+   "app/main.py",
+   "b548dade7e0e"
+  ],
+  [
+   "policy/__init__.py",
+   "8b137891791f"
+  ],
+  [
+   "policy/tests/__init__.py",
+   "8b137891791f"
+  ],
+  [
+   "policy/tests/test_webhook.py",
+   "9c59759cbafd"
+  ],
+  [
+   "policy/webhook.py",
+   "4d593d52da5c"
+  ],
+  [
+   "pyproject.toml",
+   "d4d1c20b86cf"
+  ],
+  [
+   "tests/__init__.py",
+   "8b137891791f"
+  ],
+  [
+   "tests/test_main.py",
+   "de09b31e467f"
+  ],
+  [
+   "uv.lock",
+   "7caf3eb81b8a"
+  ]
+ ],
+ "merged_pr": null,
+ "pr_head_ref": "bump-flaky-detector",
+ "pr_head_sha": "b10c62cab10fb241bec76fc4d16e89c20c2b2fe4",
+ "pr_number": 18,
+ "ref": "refs/pull/18/merge",
+ "repository": "Shirojoufu/Service-Template",
+ "run_attempt": 1,
+ "run_id": "39853493031",
+ "schema": 1,
+ "sha": "8d451d0278b8563475d486588cd83af9d352d6b8",
+ "tests": {
+  "policy.tests.test_webhook.test_bad_deployment_is_rejected": {
+   "attempts": [
+    "passed"
+   ],
+   "deps": [
+    4,
+    5,
+    6,
+    9
+   ],
+   "duration": 0.004,
+   "fingerprint": "e3d9699434ff465ee050",
+   "fingerprint_kind": "precise"
+  },
+  "policy.tests.test_webhook.test_good_deployment_is_allowed": {
+   "attempts": [
+    "passed"
+   ],
+   "deps": [
+    4,
+    5,
+    6,
+    9
+   ],
+   "duration": 0.012,
+   "fingerprint": "e3d9699434ff465ee050",
+   "fingerprint_kind": "precise"
+  },
+  "policy.tests.test_webhook.test_healthz": {
+   "attempts": [
+    "passed"
+   ],
+   "deps": [
+    4,
+    5,
+    6,
+    9
+   ],
+   "duration": 0.005,
+   "fingerprint": "e3d9699434ff465ee050",
+   "fingerprint_kind": "precise"
+  },
+  "tests.test_main.test_healthz": {
+   "attempts": [
+    "passed"
+   ],
+   "deps": [
+    1,
+    6,
+    8,
+    9
+   ],
+   "duration": 0.005,
+   "fingerprint": "cd68ef485a95ea1eca60",
+   "fingerprint_kind": "precise"
+  },
+  "tests.test_main.test_hello": {
+   "attempts": [
+    "passed"
+   ],
+   "deps": [
+    1,
+    6,
+    8,
+    9
+   ],
+   "duration": 0.004,
+   "fingerprint": "cd68ef485a95ea1eca60",
+   "fingerprint_kind": "precise"
+  }
+ },
+ "timestamp": "2026-10-22T20:59:35Z",
+ "tree": "32e3e7878a272f2bbcbca83dc679cccd55d9e983",
+ "workflow": "CI"
+}
