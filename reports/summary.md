@@ -1,10 +1,10 @@
 # Flaky test report
 
-**Runs analysed:** 4 (2 on main, 2 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0
+**Runs analysed:** 6 (3 on main, 3 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0 · **Fixed flakes:** 0
 
 ## This run
 
-main (merge of #18) · commit `8df4960` · Bump flaky test detector to 4d866f2 (#18)
+main (merge of #19) · commit `8a8e29f` · Bump flaky test detector to v0.1.0 (#19)
 
 All 5 tests passed.
 
@@ -16,26 +16,26 @@ No flaky tests detected: no test has both passed and failed on the same code.
 
 ```mermaid
 xychart-beta
-    title "First-attempt pass rate (%), last 4 runs"
-    x-axis "Run" [1, 2, 3, 4]
+    title "First-attempt pass rate (%), last 6 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6]
     y-axis "Pass rate" 0 --> 100
-    line [100.0, 100.0, 100.0, 100.0]
+    line [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Flaky failures per run, last 4 runs"
-    x-axis "Run" [1, 2, 3, 4]
+    title "Flaky failures per run, last 6 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6]
     y-axis "Flaky failures" 0 --> 1
-    bar [0, 0, 0, 0]
+    bar [0, 0, 0, 0, 0, 0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Line coverage (%), last 4 runs"
-    x-axis "Run" [1, 2, 3, 4]
+    title "Line coverage (%), last 6 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6]
     y-axis "Coverage" 0 --> 100
-    line [92.75, 92.75, 92.75, 92.75]
+    line [92.75, 92.75, 92.75, 92.75, 92.75, 92.75]
 ```
 
 <details><summary>Run key</summary>
@@ -46,12 +46,14 @@ xychart-beta
 | 2 | `acf6660` | main (merge of #17) | 2026-10-22 |
 | 3 | `8d451d0` | PR #18 | 2026-10-22 |
 | 4 | `8df4960` | main (merge of #18) | 2026-10-22 |
+| 5 | `ac3acd4` | PR #19 | 2026-10-22 |
+| 6 | `8a8e29f` | main (merge of #19) | 2026-10-22 |
 
 </details>
 
 ## Coverage
 
-**Total:** 92.75% of 69 statements (+0.00 vs main at `acf6660`)
+**Total:** 92.75% of 69 statements (+0.00 vs main at `8df4960`)
 
 ## Graph data
 
