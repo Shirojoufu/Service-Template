@@ -9,3 +9,13 @@ run_index,timestamp,sha,event,pr_number,test,attempt,outcome,fingerprint
 1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,policy.tests.test_webhook.test_healthz,0,passed,e3d9699434ff465ee050
 1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,tests.test_main.test_healthz,0,passed,cd68ef485a95ea1eca60
 1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,tests.test_main.test_hello,0,passed,cd68ef485a95ea1eca60
+2,2026-10-22T20:59:35Z,8d451d0278b8563475d486588cd83af9d352d6b8,pull_request,18,policy.tests.test_webhook.test_bad_deployment_is_rejected,0,passed,e3d9699434ff465ee050
+2,2026-10-22T20:59:35Z,8d451d0278b8563475d486588cd83af9d352d6b8,pull_request,18,policy.tests.test_webhook.test_good_deployment_is_allowed,0,passed,e3d9699434ff465ee050
+2,2026-10-22T20:59:35Z,8d451d0278b8563475d486588cd83af9d352d6b8,pull_request,18,policy.tests.test_webhook.test_healthz,0,passed,e3d9699434ff465ee050
+2,2026-10-22T20:59:35Z,8d451d0278b8563475d486588cd83af9d352d6b8,pull_request,18,tests.test_main.test_healthz,0,passed,cd68ef485a95ea1eca60
+2,2026-10-22T20:59:35Z,8d451d0278b8563475d486588cd83af9d352d6b8,pull_request,18,tests.test_main.test_hello,0,passed,cd68ef485a95ea1eca60
+3,2026-10-22T21:10:58Z,8df496021c501d91ee25237cffc66133fad83610,push,,policy.tests.test_webhook.test_bad_deployment_is_rejected,0,passed,e3d9699434ff465ee050
+3,2026-10-22T21:10:58Z,8df496021c501d91ee25237cffc66133fad83610,push,,policy.tests.test_webhook.test_good_deployment_is_allowed,0,passed,e3d9699434ff465ee050
+3,2026-10-22T21:10:58Z,8df496021c501d91ee25237cffc66133fad83610,push,,policy.tests.test_webhook.test_healthz,0,passed,e3d9699434ff465ee050
+3,2026-10-22T21:10:58Z,8df496021c501d91ee25237cffc66133fad83610,push,,tests.test_main.test_healthz,0,passed,cd68ef485a95ea1eca60
+3,2026-10-22T21:10:58Z,8df496021c501d91ee25237cffc66133fad83610,push,,tests.test_main.test_hello,0,passed,cd68ef485a95ea1eca60

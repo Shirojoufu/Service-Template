@@ -1,10 +1,10 @@
 # Flaky test report
 
-**Runs analysed:** 2 (1 on main, 1 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0
+**Runs analysed:** 4 (2 on main, 2 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0
 
 ## This run
 
-main (merge of #17) · commit `acf6660` · Add flaky test detection and per-test coverage to CI (#17)
+main (merge of #18) · commit `8df4960` · Bump flaky test detector to 4d866f2 (#18)
 
 All 5 tests passed.
 
@@ -16,31 +16,42 @@ No flaky tests detected: no test has both passed and failed on the same code.
 
 ```mermaid
 xychart-beta
-    title "First-attempt pass rate (%), last 2 runs"
-    x-axis ["bccfb7f", "acf6660"]
+    title "First-attempt pass rate (%), last 4 runs"
+    x-axis "Run" [1, 2, 3, 4]
     y-axis "Pass rate" 0 --> 100
-    line [100.0, 100.0]
+    line [100.0, 100.0, 100.0, 100.0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Flaky failures per run, last 2 runs"
-    x-axis ["bccfb7f", "acf6660"]
+    title "Flaky failures per run, last 4 runs"
+    x-axis "Run" [1, 2, 3, 4]
     y-axis "Flaky failures" 0 --> 1
-    bar [0, 0]
+    bar [0, 0, 0, 0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Line coverage (%), last 2 runs"
-    x-axis ["bccfb7f", "acf6660"]
+    title "Line coverage (%), last 4 runs"
+    x-axis "Run" [1, 2, 3, 4]
     y-axis "Coverage" 0 --> 100
-    line [92.75, 92.75]
+    line [92.75, 92.75, 92.75, 92.75]
 ```
+
+<details><summary>Run key</summary>
+
+| Run | Commit | Where | Date |
+| --- | --- | --- | --- |
+| 1 | `bccfb7f` | PR #17 | 2026-10-22 |
+| 2 | `acf6660` | main (merge of #17) | 2026-10-22 |
+| 3 | `8d451d0` | PR #18 | 2026-10-22 |
+| 4 | `8df4960` | main (merge of #18) | 2026-10-22 |
+
+</details>
 
 ## Coverage
 
-**Total:** 92.75% of 69 statements
+**Total:** 92.75% of 69 statements (+0.00 vs main at `acf6660`)
 
 ## Graph data
 
