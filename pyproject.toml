@@ -12,7 +12,17 @@ dev = [
     "pytest",
     "httpx2",  # Starlette/FastAPI TestClient compatibility
     "ruff>=0.17.1",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.uv]
 default-groups = ["dev"]
+
+# Per-test coverage for flaky test detection: each test's fingerprint covers the files it runs.
+[tool.coverage.run]
+source = ["app", "policy", "tests"]
+relative_files = true
+core = "ctrace"  # Python 3.14+ defaults to sysmon, which records per-test contexts incompletely
+
+[tool.coverage.json]
+show_contexts = true

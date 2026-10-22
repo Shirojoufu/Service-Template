@@ -13,6 +13,8 @@ dist/
 .coverage.*
 htmlcov/
 coverage.xml
+coverage.json
+.flaky/
 # Secrets
 .env
 .env.*
