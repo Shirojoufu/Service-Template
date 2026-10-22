@@ -1,0 +1,11 @@
+run_index,timestamp,sha,event,pr_number,test,attempt,outcome,fingerprint
+0,2026-10-22T18:09:11Z,bccfb7f1219e6b4587e7e29642b49710d14188b4,pull_request,17,policy.tests.test_webhook.test_bad_deployment_is_rejected,0,passed,e3d9699434ff465ee050
+0,2026-10-22T18:09:11Z,bccfb7f1219e6b4587e7e29642b49710d14188b4,pull_request,17,policy.tests.test_webhook.test_good_deployment_is_allowed,0,passed,e3d9699434ff465ee050
+0,2026-10-22T18:09:11Z,bccfb7f1219e6b4587e7e29642b49710d14188b4,pull_request,17,policy.tests.test_webhook.test_healthz,0,passed,e3d9699434ff465ee050
+0,2026-10-22T18:09:11Z,bccfb7f1219e6b4587e7e29642b49710d14188b4,pull_request,17,tests.test_main.test_healthz,0,passed,cd68ef485a95ea1eca60
+0,2026-10-22T18:09:11Z,bccfb7f1219e6b4587e7e29642b49710d14188b4,pull_request,17,tests.test_main.test_hello,0,passed,cd68ef485a95ea1eca60
+1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,policy.tests.test_webhook.test_bad_deployment_is_rejected,0,passed,e3d9699434ff465ee050
+1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,policy.tests.test_webhook.test_good_deployment_is_allowed,0,passed,e3d9699434ff465ee050
+1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,policy.tests.test_webhook.test_healthz,0,passed,e3d9699434ff465ee050
+1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,tests.test_main.test_healthz,0,passed,cd68ef485a95ea1eca60
+1,2026-10-22T20:46:57Z,acf66603a22bb3854ce07b2131cf83223f9c3b7d,push,,tests.test_main.test_hello,0,passed,cd68ef485a95ea1eca60

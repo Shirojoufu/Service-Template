@@ -1,0 +1,19 @@
+{
+ "available": true,
+ "run_index": 1,
+ "sha": "acf66603a22bb3854ce07b2131cf83223f9c3b7d",
+ "percent": 92.75,
+ "statements": 69,
+ "covered": 64,
+ "threshold": 80.0,
+ "baseline": null,
+ "below_threshold": [],
+ "never_executed": [],
+ "diff": {
+  "changed_statements": 0,
+  "covered": 0,
+  "files": {},
+  "percent": null,
+  "unmeasured_files": []
+ }
+}
