@@ -3,6 +3,10 @@
 ARG PYTHON_VERSION=3.15.0
 FROM python:${PYTHON_VERSION}-slim
 
+RUN apt-get update \
+    && apt-get upgrade --yes \
+    && rm -rf /var/lib/apt/lists/*
+
 # uv binary from the official image, pinned by version and digest so the
 # build can't change underneath us (Dependabot bumps it)
 COPY --from=ghcr.io/astral-sh/uv:0.13.4@sha256:9f130421e930bfbdc563c00740466603f8723158e90297d07957c2294640262b /uv /usr/local/bin/uv
