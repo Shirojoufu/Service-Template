@@ -1,10 +1,10 @@
 # Flaky test report
 
-**Runs analysed:** 7 (4 on main, 3 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0 · **Fixed flakes:** 0
+**Runs analysed:** 10 (5 on main, 5 from pull requests) · **Tests tracked:** 5 · **Flaky:** 0 (🔴 0 critical, 🟠 0 high, 🟡 0 medium, ⚪ 0 low) · **Consistently failing:** 0 · **Fixed flakes:** 0
 
 ## This run
 
-main (merge of #20) · commit `caa8b83` · Bump astral-sh/setup-uv from 10.3.0 to 10.3.2 (#20)
+main (merge of #23) · commit `376d43c` · Update Dependabot GitHub Actions (#23)
 
 All 5 tests passed.
 
@@ -16,26 +16,26 @@ No flaky tests detected: no test has both passed and failed on the same code.
 
 ```mermaid
 xychart-beta
-    title "First-attempt pass rate (%), last 7 runs"
-    x-axis "Run" [1, 2, 3, 4, 5, 6, 7]
+    title "First-attempt pass rate (%), last 10 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     y-axis "Pass rate" 0 --> 100
-    line [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+    line [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Flaky failures per run, last 7 runs"
-    x-axis "Run" [1, 2, 3, 4, 5, 6, 7]
+    title "Flaky failures per run, last 10 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     y-axis "Flaky failures" 0 --> 1
-    bar [0, 0, 0, 0, 0, 0, 0]
+    bar [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Line coverage (%), last 7 runs"
-    x-axis "Run" [1, 2, 3, 4, 5, 6, 7]
+    title "Line coverage (%), last 10 runs"
+    x-axis "Run" [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     y-axis "Coverage" 0 --> 100
-    line [92.75, 92.75, 92.75, 92.75, 92.75, 92.75, 92.75]
+    line [92.75, 92.75, 92.75, 92.75, 92.75, 92.75, 92.75, 92.75, 92.75, 92.75]
 ```
 
 <details><summary>Run key</summary>
@@ -49,12 +49,15 @@ xychart-beta
 | 5 | `ac3acd4` | PR #19 | 2026-10-22 |
 | 6 | `8a8e29f` | main (merge of #19) | 2026-10-22 |
 | 7 | `caa8b83` | main (merge of #20) | 2026-10-28 |
+| 8 | `3bcd06b` | PR #23 | 2026-11-18 |
+| 9 | `210d230` | PR #23 | 2026-11-18 |
+| 10 | `376d43c` | main (merge of #23) | 2026-11-18 |
 
 </details>
 
 ## Coverage
 
-**Total:** 92.75% of 69 statements (+0.00 vs main at `8a8e29f`)
+**Total:** 92.75% of 69 statements (+0.00 vs main at `caa8b83`)
 
 ## Graph data
 
